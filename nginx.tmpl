@@ -96,6 +96,8 @@ upstream {{ .Upstream }} {
         {{ $defaultPort := (when (eq (len $container.Addresses) 1) (first $container.Addresses) (dict "Port" "80")).Port }}
         {{ $port := (coalesce $container.Env.VIRTUAL_PORT $defaultPort) }}
         {{ $address := where $container.Addresses "Port" $port | first }}
+		{{ $maxFails := (coalesce $container.Env.UPSTREAM_MAX_FAILS "1") }}
+		{{ $failTimeout := (coalesce $container.Env.UPSTREAM_FILE_TIMEOUT "10s") }}
         {{ if $debug }}
         # Exposed ports: {{ $container.Addresses }}
         # Default virtual port: {{ $defaultPort }}
@@ -113,7 +115,7 @@ upstream {{ .Upstream }} {
                         {{ if and $container.Node.ID $address.HostPort }}
                             {{ $server_found = "true" }}
         # {{ $container.Node.Name }}/{{ $container.Name }}
-        server {{ $container.Node.Address.IP }}:{{ $address.HostPort }};
+        server {{ $container.Node.Address.IP }}:{{ $address.HostPort }} max_fails={{ $maxFails }} fail_timeout={{ $failTimeout }};
                         {{/* If there is no swarm node or the port is not published on host, use container's IP:PORT */}}
                         {{ else if $containerNetwork }}
                             {{ $server_found = "true" }}
