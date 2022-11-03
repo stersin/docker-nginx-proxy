@@ -97,7 +97,7 @@ upstream {{ .Upstream }} {
         {{ $port := (coalesce $container.Env.VIRTUAL_PORT $defaultPort) }}
         {{ $address := where $container.Addresses "Port" $port | first }}
         {{ $maxFails := (coalesce $container.Env.UPSTREAM_MAX_FAILS "1") }}
-        {{ $failTimeout := (coalesce $container.Env.UPSTREAM_FILE_TIMEOUT "10s") }}
+        {{ $failTimeout := (coalesce $container.Env.UPSTREAM_FAIL_TIMEOUT "10s") }}
         {{ if $debug }}
         # Exposed ports: {{ $container.Addresses }}
         # Default virtual port: {{ $defaultPort }}
